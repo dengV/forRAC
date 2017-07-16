@@ -1,1 +1,112 @@
 
+
+
+
+#import <Foundation/Foundation.h>
+
+@interface CalculatorMaker : NSObject
+
+@property (nonatomic, assign ) int result;
+
+- (CalculatorMaker *(^)(int))add;
+- (CalculatorMaker *(^)(int))sub;
+- (CalculatorMaker *(^)(int))multiply;
+
+- (CalculatorMaker *(^)(int))divide;
+
+
+
+@end
+
+
+
+
+
+
+
+#import "CalculatorMaker.h"
+
+@implementation CalculatorMaker
+
+- (CalculatorMaker *(^)(int))add{
+    return ^CalculatorMaker *(int value){
+        _result += value;
+        return self;
+    };
+
+}
+
+
+- (CalculatorMaker *(^)(int))divide{
+    return ^CalculatorMaker *(int value){
+        _result /= value;
+        return self;
+    };
+}
+
+@end
+
+
+
+
+
+
+
+
+
+#import <Foundation/Foundation.h>
+
+@class CalculatorMaker;
+
+
+@interface NSObject (Calculator)
+
+
++ (int )makeCalculators: (void(^)(CalculatorMaker * maker )) calculatorBlock;
+
+
+
+@end
+
+
+
+
+
+
+
+
+#import "NSObject+Calculator.h"
+#import "CalculatorMaker.h"
+@implementation NSObject (Calculator)
+
+
+
++ (int)makeCalculators:(void (^)(CalculatorMaker *))calculatorBlock{
+
+    CalculatorMaker * make = [[CalculatorMaker alloc ] init ];
+    calculatorBlock(make);
+    return make.result;
+};
+
+
+
+
+@end
+
+
+
+
+
+
+
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    int result = [NSObject makeCalculators:^(CalculatorMaker *maker) {
+        maker.add(10).divide(2);
+        
+    }];
+    NSLog(@"%d", result);
+}
+
